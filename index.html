@@ -84,10 +84,33 @@
       <button>End Timer</button>
       <button>Console Trace</button>
       <button>Trigger a Global Error</button>
+      <button>Try/Catch</button>
+      <button>Custom Error</button>
     </section>
-  </main>
 
+    <div id="user-info">Welcome, user!</div>
+
+  </main>
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
   <script>
+    window.TrackJS && TrackJS.install({
+      token: "YOUR_TRACKJS_TOKEN", // Replace with your real token
+      application: "console-demo"
+    });
+    window.onerror = function (message, source, lineno, colno, error) {
+      console.log('[Global Error Handler]');
+      console.log('Message:', message);
+      console.log('Source:', source);
+      console.log('Line:', lineno);
+      console.log('Column:', colno);
+      console.log('Error object:', error);
+    };
+    class UserInfoError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = 'UserInfoError';
+      }
+    }
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -102,6 +125,126 @@
 
     // Start your code here
     // You may move this JS to another file if you wish
+    const buttons = document.querySelectorAll('#error-btns button');
+
+    const data = [
+      { name: 'Alice', age: 30 },
+      { name: 'Bob', age: 25 },
+    ];
+
+    const obj = {
+      name: 'Charlie',
+      details: {
+        age: 35,
+        occupation: 'Engineer'
+      }
+    };
+
+    buttons[0].addEventListener('click', () => {
+      console.log('Console log', data);
+    });
+
+    buttons[1].addEventListener('click', () => {
+      console.error('Console error');
+    });
+
+    buttons[2].addEventListener('click', () => {
+      console.count('Console count');
+    });
+
+    buttons[3].addEventListener('click', () => {
+      console.warn('Console warning');
+    });
+
+    buttons[4].addEventListener('click', () => {
+      console.assert(false, 'Console assertion failed');
+    });
+
+    buttons[5].addEventListener('click', () => {
+      console.clear();
+    });
+
+    buttons[6].addEventListener('click', () => {
+      console.dir(obj);
+    });
+
+    buttons[7].addEventListener('click', () => {
+      console.dirxml(document.body);
+    });
+
+    buttons[8].addEventListener('click', () => {
+      console.group('Console group');
+      console.log('Log inside group');
+      console.warn('Warning inside group');
+      console.error('Error inside group');
+    });
+
+    buttons[9].addEventListener('click', () => {
+      console.groupEnd();
+    });
+
+    buttons[10].addEventListener('click', () => {
+      console.table(data);
+    });
+
+    buttons[11].addEventListener('click', () => {
+      console.time('timer');
+    });
+
+    buttons[12].addEventListener('click', () => {
+      console.timeEnd('timer');
+    });
+
+    buttons[13].addEventListener('click', () => {
+      function traceExample() {
+        function inner() {
+          console.trace('Console trace');
+        }
+        inner();
+      }
+      traceExample();
+    });
+    buttons[14].addEventListener('click', () => {
+      // Trigger a global error by calling a nonexistent function
+      nonExistentFunction(); // This throws ReferenceError
+    });
+    buttons[15].addEventListener('click', () => {
+      try {
+        const userDiv = document.getElementById('user-info');
+
+        if (!userDiv) {
+          throw new Error('user-info element not found in the DOM');
+        }
+
+        const content = userDiv.textContent;
+        console.log('User info content:', content);
+      } catch (error) {
+        console.error('Caught an error:', error.message);
+      } finally {
+        console.log('done reading #user-info');
+      }
+    });
+
+    buttons[16].addEventListener('click', () => {
+      try {
+        const userDiv = document.getElementById('user-info');
+
+        if (!userDiv || userDiv.textContent.trim() === '') {
+          throw new UserInfoError('User info unavailable');
+        }
+
+        console.log('User info content:', userDiv.textContent);
+      } catch (error) {
+        if (error instanceof UserInfoError) {
+          console.error(`[Custom Error] ${error.name}: ${error.message}`);
+        } else {
+          console.error('[Unknown Error]', error);
+        }
+      } finally {
+        console.log('custom error done.');
+      }
+    });
+
   </script>
 </body>
 
